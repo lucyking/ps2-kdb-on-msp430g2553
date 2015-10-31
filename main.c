@@ -1,7 +1,7 @@
 /*
  *  DATE: 2013-07-22
- *  AUTEUR: Jacques Deschênes
- *  DESCRIPTION: Démo interface avec clavier PS/2
+ *  AUTEUR: Jacques DeschÃªnes
+ *  DESCRIPTION: DÃ©mo interface avec clavier PS/2
  *  MONTAGE:
  *   	LAUNCHPAD				CLAVIER
  *   	 G2553				mini DIN-6 (PS/2)
@@ -37,7 +37,7 @@ void kbd_error(){
 	LPM4;
 }
 
-typedef struct letter2tone{// transcription de lettre à note
+typedef struct letter2tone{// transcription de lettre Ã  note
 	int letter;
 	int tone;
 }t_letter2tone;
@@ -45,8 +45,8 @@ typedef struct letter2tone{// transcription de lettre à note
 const t_letter2tone scale[]={ // table de transcription code clavier vers notes
 		{0x1c,3822}, //do4
 		{0x1d,3608}, //do#4
-		{0x1b,3405}, //ré4
-		{0x24,3214}, //ré#4
+		{0x1b,3405}, //rÃ©4
+		{0x24,3214}, //rÃ©#4
 		{0x23,3034}, //mi4
 		{0x2b,2863}, //fa4
 		{0x2c,2703}, //fa#4
@@ -57,8 +57,8 @@ const t_letter2tone scale[]={ // table de transcription code clavier vers notes
 		{0x3b,2025}, //si4
 		{0x42,1911}, //do5
 		{0x44,1804}, //do#5
-		{0x4b,1703}, //ré5
-		{0x4d,1607}, //ré#5
+		{0x4b,1703}, //rÃ©5
+		{0x4d,1607}, //rÃ©#5
 		{0,0}
 };
 
@@ -90,9 +90,9 @@ void main(void) {
     BCSCTL3 = XCAP_3; /* 12.5pF pour que LFXT1 fonctionne avec
                          le crystal 32768Hz fourni avec le launchpad */
     IE1 |= OFIE;
-    _enable_interrupts();
-    P1REN &= ~OK_LED; //pullup sur les Entrées
-    P1OUT &= ~OK_LED; // non utilisées.
+    __enable_interrupt();  //_enable_interrupts();
+    P1REN &= ~OK_LED; //pullup sur les EntrÃ©es
+    P1OUT &= ~OK_LED; // non utilisÃ©es.
     P1DIR |= OK_LED;
     P1OUT &= ~OK_LED;
     if (init_ps2_kbd()){
@@ -100,7 +100,7 @@ void main(void) {
     	delay_ms(500);
     	P1OUT &= ~OK_LED;
     	int led=1;
-    	while (1){ // test1: allumes les 3 LEDs en séquence
+    	while (1){ // test1: allumes les 3 LEDs en sÃ©quence
     		if (!set_kbd_leds(led)){
     			kbd_error();
     		}
@@ -116,7 +116,7 @@ void main(void) {
     	} // test1
     	if (!set_kbd_leds(0)) kbd_error();
     	run=1;
-    	while (run){ // test2: répond aux touches CAPSLOCK, NUMLOCK,SCROLL
+    	while (run){ // test2: rÃ©pond aux touches CAPSLOCK, NUMLOCK,SCROLL
     		c=get_scancode();
     		switch(c&0x1ff){
     		case 0:
@@ -154,7 +154,7 @@ void main(void) {
     	delay_ms(500);
     	if (!set_kbd_leds(0)) kbd_error();
     	run=1;
-		// configuration TA1 pour sortie tonalités
+		// configuration TA1 pour sortie tonalitÃ©s
 		P2DIR |= AUDIO_OUT;
 		P2OUT &= ~AUDIO_OUT;
 		// timer a0 pour vibrato
@@ -206,11 +206,11 @@ void main(void) {
         			}else{
         				kbd_leds &= ~F_SHIFT;
         			}
-        		case UP_ARROW: // augmente fréquence vibrato
+        		case UP_ARROW: // augmente frÃ©quence vibrato
         			if ((c & REL_BIT) && (TACCR0>700))
         				TACCR0 -= TACCR0>>3;
         			break;
-        		case DOWN_ARROW: // diminue fréquence vibrato
+        		case DOWN_ARROW: // diminue frÃ©quence vibrato
         			if ((c & REL_BIT) && (TACCR0<8192))
         				TACCR0 += TACCR0>>3;
         			break;
@@ -242,14 +242,14 @@ __interrupt void nmi_ (void)
 {
   do
   {
-    IFG1 &= ~OFIFG;              // remet à zéro l'indicateur erreur Osc.
-    _delay_cycles(0xFFFF);  // délais pour laissé du temps à OFIFG de
+    IFG1 &= ~OFIFG;              // remet Ã  zÃ©ro l'indicateur erreur Osc.
+    _delay_cycles(0xFFFF);  // dÃ©lais pour laissÃ© du temps Ã  OFIFG de
             				// se remettre a 1 s'il y a encore faute.
   } while (IFG1 & OFIFG);  // boucle tant qu'il y a erreur
-  IE1 &= ~OFIE;           // désactive l'interruption sur erreur osc.
+  IE1 &= ~OFIE;           // dÃ©sactive l'interruption sur erreur osc.
 }
 
-// vecteurs d'interruptions inutilisés
+// vecteurs d'interruptions inutilisÃ©s
 #pragma vector=PORT2_VECTOR
 #pragma vector=ADC10_VECTOR
 #pragma vector=USCIAB0TX_VECTOR
