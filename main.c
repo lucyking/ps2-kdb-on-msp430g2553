@@ -13,9 +13,10 @@
  */
 
 #include <msp430.h> 
+ #include "msp430g2553.h"
 
 #include "ps2-kbd.h"
-#include "qwerty.h"
+#include "QWERTY.h"
 
 
 
@@ -23,16 +24,19 @@
 #define AUDIO_OUT BIT2 // sortie audio pour test3, clavier musical
 
 void configure_clock(){
+	//BCSCTL1 = CALBC1_16MHZ;
+	//DCOCTL = CALDCO_16MHZ;
 	BCSCTL1 = CALBC1_16MHZ;
 	DCOCTL = CALDCO_16MHZ;
 }// configure_clock();
 
 void delay_ms(unsigned int ms){
 	while (ms--)
-		_delay_cycles(16000);
+		__delay_cycles(16000);
 } // delay_ms()
 
 void kbd_error(){
+	P1OUT |= 0;
 	P1OUT |= OK_LED;
 	LPM4;
 }
@@ -90,7 +94,7 @@ void main(void) {
     BCSCTL3 = XCAP_3; /* 12.5pF pour que LFXT1 fonctionne avec
                          le crystal 32768Hz fourni avec le launchpad */
     IE1 |= OFIE;
-    __enable_interrupt();  //_enable_interrupts();
+    __enable_interrupt();
     P1REN &= ~OK_LED; //pullup sur les Entrées
     P1OUT &= ~OK_LED; // non utilisées.
     P1DIR |= OK_LED;
@@ -121,6 +125,23 @@ void main(void) {
     		switch(c&0x1ff){
     		case 0:
     			break;
+
+		case 0x1c:
+			/*
+			P1OUT |= OK_LED;
+			delay_ms(500);
+			P1OUT &= ~OK_LED;
+			delay_ms(500);
+			*/
+			
+			P1OUT |= OK_LED;
+			delay_ms(500);
+			P1OUT ^= OK_LED;
+			delay_ms(500);
+			break;
+			
+			
+
     		case CAPS_LOCK:
     			if (c & REL_BIT){
     				kbd_leds ^= F_CAPS;
@@ -237,17 +258,18 @@ void main(void) {
 
 #pragma vector=NMI_VECTOR /* interruption non masquable. Va se produire si
                            * l'oscillateur LFXT1 tombe en panne. */
-
+/*
 __interrupt void nmi_ (void)
 {
   do
   {
     IFG1 &= ~OFIFG;              // remet à zéro l'indicateur erreur Osc.
-    _delay_cycles(0xFFFF);  // délais pour laissé du temps à OFIFG de
+    __delay_cycles(0xFFFF);  // délais pour laissé du temps à OFIFG de
             				// se remettre a 1 s'il y a encore faute.
   } while (IFG1 & OFIFG);  // boucle tant qu'il y a erreur
   IE1 &= ~OFIE;           // désactive l'interruption sur erreur osc.
 }
+*/
 
 // vecteurs d'interruptions inutilisés
 #pragma vector=PORT2_VECTOR
